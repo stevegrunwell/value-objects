@@ -11,6 +11,11 @@ Warning: once you start using proper value objects, you may never be able to go 
 ## Resources
 
 * [The Beauty of PHP Value Objects](https://stevegrunwell.com/blog/php-value-objects/) - Blog post that serves as the foundation for this talk
+* [Value Objects in PHP 8](https://dev.to/cnastasi/value-objects-in-php-8-building-a-better-code-38k8) - A three-part series by Christian Nastasi that goes in-depth with value objects
+* [Eloquent: Mutators and Casting](https://laravel.com/docs/master/eloquent-mutators) - Laravel documentation mutators and casting of properties
+* [Value Object](https://martinfowler.com/bliki/ValueObject.html) — Article by Martin Fowler describing value objects
+* [Writing Value Objects in PHP](https://dev.to/ianrodrigues/writing-value-objects-in-php-4acg) — Great article by Ian Rodrigues describing the inner-workings of value objects
+* [Primitive Obsession](https://refactoring.guru/smells/primitive-obsession) - Refactoring-focused post discussing developers' desire to reduce everything to primitives
 
 ## Presentation History
 
