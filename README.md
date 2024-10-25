@@ -19,4 +19,4 @@ Warning: once you start using proper value objects, you may never be able to go 
 
 ## Presentation History
 
-* [Cascadia PHP 2024](https://cascadiaphp.com/) — October 25, 2024 ([joind.in](https://joind.in/talk/8c2f3))
+* [Cascadia PHP 2024](https://cascadiaphp.com/) — October 25, 2024 ([PDF](https://github.com/stevegrunwell/value-objects/releases/download/cascadia-php-2024/slides.pdf), [joind.in](https://joind.in/talk/8c2f3))

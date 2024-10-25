@@ -17,7 +17,7 @@ Note:
 
 If you take nothing else away from this talk, remember:
 
-1. Value objects are immutable
+1. Value objects are immutable (meaning they cannot change)
 2. Value objects are always in a valid state
 
 ----
