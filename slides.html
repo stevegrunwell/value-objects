@@ -127,8 +127,8 @@ $var += 6;
     * single (possibly-complex) value <!-- .element: class="fragment" data-fragment-index="0" -->
     * must be valid <!-- .element: class="fragment" data-fragment-index="1" -->
 
-<aside class="notes"><p>While they&#39;re related, please don&#39;t confused Value Objects with Data Transfer Objects (DTOs).</p>
-<p>DTOs are meant to provide a simplified representation of an entity or model; think how you might format the model to send it to the front end of your app.</p>
+<aside class="notes"><p>While they&#39;re related, please don&#39;t confuse Value Objects with Data Transfer Objects (DTOs).</p>
+<p>DTOs are meant to provide a simplified representation of an entity or model; think how you might format the model to send it to the front end of your app. These are generally used in two places: when you&#39;re ingesting user requests and when you&#39;re sending data out of the application (front-end, APIs, etc.).</p>
 <p>Value objects, on the other hand, represent a single value.</p>
 <p>Additionally, DTOs enforce the shape of the data, but <strong>do not</strong> necessarily guarantee that data aheres to domain requirements (e.g. you might have an age less than zero)</p>
 <p>However, there&#39;s nothing stopping you from including value objects in your DTOs as long as you ensure that they can be serialized properly (more on this in a moment).</p>
@@ -222,7 +222,7 @@ class NonEmptyString
 <aside class="notes"><p>If you&#39;re using modern versions of PHP, you can take advantage of some nice features:</p>
 <p>Readonly properties (PHP 8.1+) for direct property access (instead of a <code>getValue()</code>) method while staying immutable</p>
 <p>This could be emulated with magic __get() methods, but setters should not be defined</p>
-<p>Similarly, property hooks (coming in PHP 8.4) can simplify the retrieval of values, but should not be used for setters; all values should be passed via the constructor, then the object should be immutable!</p>
+<p>Similarly, property hooks (PHP 8.4+) can simplify the retrieval of values, but should not be used for setters; all values should be passed via the constructor, then the object should be immutable!</p>
 </aside></script></section><section data-markdown><script type="text/template">
 ### Constructor Property Promotion
 
@@ -239,14 +239,14 @@ class Age
     }
 }
 ```
-<!-- .element: class="hide-line-numbers" -->
+<!-- .element: class="hide-line-numbers growth-spurt" -->
 
-<aside class="notes"><p>With constructor property promotion (was introduced in PHP 8.0), we can also do something like this to create a public, readonly property named value.</p>
+<aside class="notes"><p>With constructor property promotion (was introduced in PHP 8.0), we can also do something like this to create a public, readonly (again, 8.1+) property named value.</p>
 <p>Note that the constructor method still runs, so we can throw an exception if the value is an integer less than zero.</p>
 </aside></script></section><section data-markdown><script type="text/template">
 ### Complex Value Objects
 
-```php [5-8|9-13]
+```php [|5-8|9-13]
 use App\Enums\Currency;
 
 class Price
@@ -450,32 +450,32 @@ class Username
 ### Comparing Value Objects
 
 ```php [1-2|4-5|7-8]
-$age1 = new Age(40);
-$age2 = new Age(40);
+$rating1 = new AverageRating(4.0);
+$rating2 = new AverageRating(4.0);
 
-$age1 == $age2;
+$rating1 == $rating2;
 #=> bool(true);
 
-$age1 === $age2;
+$rating1 === $rating2;
 #=> bool(false)
 ```
 <!-- .element: class="hide-line-numbers" -->
 
 <aside class="notes"><p>One drawback to value objects is that we need to be clever when comparing them, because each time we call the constructor we get a new instance of the object.</p>
-<p>Given two instances of Age with the same value of 40, they will evaluate as loosely equal but, because they are separate instances, will fail a strict equality check.</p>
+<p>Given two instances of AverageRating with the same value of 4.00, they will evaluate as loosely equal but, because they are separate instances, will fail a strict equality check.</p>
 <p>There are a few ways we can address this:</p>
 </aside></script></section><section data-markdown><script type="text/template">
 #### Comparator Methods
 
 ```php
-public function isEqualTo(Age $age): bool
+public function isEqualTo(AverageRating $rating): bool
 {
-    return $age->value === $this->value;
+    return $rating->value === $this->value;
 }
 ```
 
 ```php
-$age1->isEqualTo($age2);
+$rating1->isEqualTo($rating2);
 #=> bool(true)
 ```
 <!-- .element: class="fragment" -->
@@ -494,6 +494,7 @@ public function isSameBuilding(Address $address): bool
         && $this->postal_code == $address->postal_code;
 }
 ```
+<!-- .element: class="growth-spurt" -->
 
 <aside class="notes"><p>If you&#39;re dealing with complex or compound value objects, you might also consider comparators that operate on multiple values.</p>
 <p>In this instance, we might have an <code>isSameBuilding()</code> method that checks the key values but ignores things like apartment/suite number.</p>
@@ -503,13 +504,13 @@ public function isSameBuilding(Address $address): bool
 #### Value comparisons
 
 ```php [1-2|4-5|7-8]
-$age1->value === $age2->value;
+$rating1->value === $rating2->value;
 #=> bool(true)
 
-$age1->checksum() === $age2->checksum();
+$rating1->checksum() === $rating2->checksum();
 #=> bool(true)
 
-(string) $age1 === (string) $age2;
+(string) $rating1 === (string) $rating2;
 #=> bool(true)
 ```
 <!-- .element: class="hide-line-numbers" -->
@@ -587,8 +588,8 @@ class Coordinates implements \JsonSerializable
 ```
 
 ```php
-json_encode(new Coordinates(45.507, -122.683));
-#=> {"lat":45.507,"lng":-122.683}
+json_encode(new Coordinates(41.9974, -87.8844));
+#=> {"lat":41.9974,"lng":-87.8844}
 ```
 <!-- .element: class="fragment" -->
 
@@ -607,7 +608,7 @@ $dbh->query($query)
         )
     );
 ```
-<!-- .element: class="hide-line-numbers" -->
+<!-- .element: class="hide-line-numbers growth-spurt" -->
 
 <aside class="notes"><p>If you&#39;re interacting with a database, automatically retrieving specific columns as value objects can be immensely helpful.</p>
 <p>If you&#39;re using PDO directly, you might define a fetch function like this that automatically casts results to value objects.</p>
@@ -638,12 +639,12 @@ class Profile extends Model
 <aside class="notes"><p>If you&#39;re using Laravel, Eloquent has a built-in way to cast model properties.</p>
 <p>If you&#39;ve noticed that columns like created_at and updated_at come back as Carbon objects, this should be very familiar (same approach).</p>
 <p>First, we need to generate a new implementation of the <code>Illuminate\Contracts\Database\Eloquent\CastsAttributes</code> interface, which we can do with this Artisan command.</p>
-<p>It will generate a HexColor class that implements CastsAttributes, which has two methods:</p>
+<p>It will generate a App\Casts\HexColor class that implements CastsAttributes, which has two methods:</p>
 <ol>
 <li><code>get()</code> will return a value object</li>
 <li><code>set()</code> will extract the underlying value so that it may be stored in the database</li>
 </ol>
-<p>Then, in our model, add the property to array returned from our <code>casts()</code> method, ensuring it references the CastsAttributes implementation. Now, any time we reference the background_color attribute on our model, we&#39;ll get a HexColor value object.</p>
+<p>Then, in our model, add the property to the array returned from our <code>casts()</code> method, ensuring it references the CastsAttributes implementation. Now, any time we reference the background_color attribute on our model, we&#39;ll get a HexColor value object.</p>
 <p>If you&#39;re using Doctrine, look at &quot;Custom Mapping Types&quot; and &quot;Embedables&quot;</p>
 </aside></script></section></section><section ><section data-markdown><script type="text/template">
 ## Adding Value to your<br>Value Objects
@@ -720,9 +721,9 @@ class Age
     // ...
 
     public static function fromBirthdate(
-        DateTimeInterface $bday
+        \DateTimeInterface $bday
     ): self {
-        $age = new DateTimeImmutable('now')
+        $age = (new \DateTimeImmutable('now'))
             ->diff($bday)
             ->format('%Y');
 
@@ -741,7 +742,7 @@ class Age
 $request_body = [
     'name' => 'Taco',
     'type' => 'cat',
-    'age'  => 2,
+    'age'  => 3,
 ];
 ```
 
