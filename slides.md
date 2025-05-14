@@ -153,9 +153,9 @@ If an enum makes more sense for your domain, by all means use that instead of a 
 
 Note:
 
-While they're related, please don't confused Value Objects with Data Transfer Objects (DTOs).
+While they're related, please don't confuse Value Objects with Data Transfer Objects (DTOs).
 
-DTOs are meant to provide a simplified representation of an entity or model; think how you might format the model to send it to the front end of your app.
+DTOs are meant to provide a simplified representation of an entity or model; think how you might format the model to send it to the front end of your app. These are generally used in two places: when you're ingesting user requests and when you're sending data out of the application (front-end, APIs, etc.).
 
 Value objects, on the other hand, represent a single value.
 
@@ -286,7 +286,7 @@ Readonly properties (PHP 8.1+) for direct property access (instead of a `getValu
 
 This could be emulated with magic __get() methods, but setters should not be defined
 
-Similarly, property hooks (coming in PHP 8.4) can simplify the retrieval of values, but should not be used for setters; all values should be passed via the constructor, then the object should be immutable!
+Similarly, property hooks (PHP 8.4+) can simplify the retrieval of values, but should not be used for setters; all values should be passed via the constructor, then the object should be immutable!
 
 ----
 
@@ -305,11 +305,11 @@ class Age
     }
 }
 ```
-<!-- .element: class="hide-line-numbers" -->
+<!-- .element: class="hide-line-numbers growth-spurt" -->
 
 Note:
 
-With constructor property promotion (was introduced in PHP 8.0), we can also do something like this to create a public, readonly property named value.
+With constructor property promotion (was introduced in PHP 8.0), we can also do something like this to create a public, readonly (again, 8.1+) property named value.
 
 Note that the constructor method still runs, so we can throw an exception if the value is an integer less than zero.
 
@@ -317,7 +317,7 @@ Note that the constructor method still runs, so we can throw an exception if the
 
 ### Complex Value Objects
 
-```php [5-8|9-13]
+```php [|5-8|9-13]
 use App\Enums\Currency;
 
 class Price
@@ -581,13 +581,13 @@ Note that this is a static method, because we can't have an invalid instance of 
 ### Comparing Value Objects
 
 ```php [1-2|4-5|7-8]
-$age1 = new Age(40);
-$age2 = new Age(40);
+$rating1 = new AverageRating(4.0);
+$rating2 = new AverageRating(4.0);
 
-$age1 == $age2;
+$rating1 == $rating2;
 #=> bool(true);
 
-$age1 === $age2;
+$rating1 === $rating2;
 #=> bool(false)
 ```
 <!-- .element: class="hide-line-numbers" -->
@@ -596,7 +596,7 @@ Note:
 
 One drawback to value objects is that we need to be clever when comparing them, because each time we call the constructor we get a new instance of the object.
 
-Given two instances of Age with the same value of 40, they will evaluate as loosely equal but, because they are separate instances, will fail a strict equality check.
+Given two instances of AverageRating with the same value of 4.00, they will evaluate as loosely equal but, because they are separate instances, will fail a strict equality check.
 
 There are a few ways we can address this:
 
@@ -605,14 +605,14 @@ There are a few ways we can address this:
 #### Comparator Methods
 
 ```php
-public function isEqualTo(Age $age): bool
+public function isEqualTo(AverageRating $rating): bool
 {
-    return $age->value === $this->value;
+    return $rating->value === $this->value;
 }
 ```
 
 ```php
-$age1->isEqualTo($age2);
+$rating1->isEqualTo($rating2);
 #=> bool(true)
 ```
 <!-- .element: class="fragment" -->
@@ -636,6 +636,7 @@ public function isSameBuilding(Address $address): bool
         && $this->postal_code == $address->postal_code;
 }
 ```
+<!-- .element: class="growth-spurt" -->
 
 Note:
 
@@ -652,13 +653,13 @@ These are powerful methods that clean up your domain logic in a way that's both 
 #### Value comparisons
 
 ```php [1-2|4-5|7-8]
-$age1->value === $age2->value;
+$rating1->value === $rating2->value;
 #=> bool(true)
 
-$age1->checksum() === $age2->checksum();
+$rating1->checksum() === $rating2->checksum();
 #=> bool(true)
 
-(string) $age1 === (string) $age2;
+(string) $rating1 === (string) $rating2;
 #=> bool(true)
 ```
 <!-- .element: class="hide-line-numbers" -->
@@ -754,8 +755,8 @@ class Coordinates implements \JsonSerializable
 ```
 
 ```php
-json_encode(new Coordinates(45.507, -122.683));
-#=> {"lat":45.507,"lng":-122.683}
+json_encode(new Coordinates(41.9974, -87.8844));
+#=> {"lat":41.9974,"lng":-87.8844}
 ```
 <!-- .element: class="fragment" -->
 
@@ -778,7 +779,7 @@ $dbh->query($query)
         )
     );
 ```
-<!-- .element: class="hide-line-numbers" -->
+<!-- .element: class="hide-line-numbers growth-spurt" -->
 
 Note:
 
@@ -820,12 +821,12 @@ If you've noticed that columns like created_at and updated_at come back as Carbo
 
 First, we need to generate a new implementation of the `Illuminate\Contracts\Database\Eloquent\CastsAttributes` interface, which we can do with this Artisan command.
 
-It will generate a HexColor class that implements CastsAttributes, which has two methods:
+It will generate a App\Casts\HexColor class that implements CastsAttributes, which has two methods:
 
 1. `get()` will return a value object
 2. `set()` will extract the underlying value so that it may be stored in the database
 
-Then, in our model, add the property to array returned from our `casts()` method, ensuring it references the CastsAttributes implementation. Now, any time we reference the background_color attribute on our model, we'll get a HexColor value object.
+Then, in our model, add the property to the array returned from our `casts()` method, ensuring it references the CastsAttributes implementation. Now, any time we reference the background_color attribute on our model, we'll get a HexColor value object.
 
 If you're using Doctrine, look at "Custom Mapping Types" and "Embedables"
 
@@ -925,9 +926,9 @@ class Age
     // ...
 
     public static function fromBirthdate(
-        DateTimeInterface $bday
+        \DateTimeInterface $bday
     ): self {
-        $age = new DateTimeImmutable('now')
+        $age = (new \DateTimeImmutable('now'))
             ->diff($bday)
             ->format('%Y');
 
@@ -951,7 +952,7 @@ For instance, we could calculate someone's age by taking their birthday (as a da
 $request_body = [
     'name' => 'Taco',
     'type' => 'cat',
-    'age'  => 2,
+    'age'  => 3,
 ];
 ```
 
