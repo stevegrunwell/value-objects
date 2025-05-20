@@ -19,5 +19,5 @@ Warning: once you start using proper value objects, you may never be able to go 
 
 ## Presentation History
 
-* [PHP Tek 2025](https://phptek.io/) — May 20, 2025 ([joind.in](https://joind.in/talk/4f722))
+* [PHP Tek 2025](https://phptek.io/) — May 20, 2025 ([PDF](https://github.com/stevegrunwell/value-objects/releases/download/php-tek-2025/slides.pdf), [joind.in](https://joind.in/talk/4f722))
 * [Cascadia PHP 2024](https://cascadiaphp.com/) — October 25, 2024 ([PDF](https://github.com/stevegrunwell/value-objects/releases/download/cascadia-php-2024/slides.pdf), [joind.in](https://joind.in/talk/8c2f3))
